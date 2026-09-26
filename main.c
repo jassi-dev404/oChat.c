@@ -38,9 +38,7 @@ int main(void) {
     } else {
       ssize_t data_collected =
           recv(abcd, buffer, sizeof(buffer), 0); // value_array_1
-      buffer[strcspn(buffer, "\r\n")] =
-          0; // idk what this means i just got this of discord
-      if (strlen(buffer) == 13) {
+      if (strlen(buffer) == 13 || strlen(buffer) == 14) {
         if (buffer[0] == 'v' && buffer[1] == 'a' && buffer[2] == 'l' &&
             buffer[3] == 'u' && buffer[4] == 'e' && buffer[5] == '_' &&
             buffer[6] == 'a' && buffer[7] == 'r' && buffer[8] == 'r' &&
@@ -50,15 +48,19 @@ int main(void) {
             sprintf(buffer2, "%d", array[ii]);
             text_to_be_sent = buffer2;
             send(abcd, text_to_be_sent, strlen(text_to_be_sent) + 1, 0);
+            printf("the data we sent from array[%i] is: %s\n", ii, text_to_be_sent);
+            fflush(stdout);
             close(abcd);
           } else {
             sprintf(buffer1, "array only goes till %i\n", length_array - 1);
             text_to_be_sent = buffer1;
             send(abcd, text_to_be_sent, strlen(text_to_be_sent) + 1, 0);
+            fflush(stdout);
             close(abcd);
           }
         } else {
           printf("the data you recieved is: %s\n", buffer);
+          fflush(stdout);
           sprintf(buffer1,
                   "your data has been sent bitch, \n if you wanted to get a "
                   "value send 'value_array_x' where x below or equal to %i\n",
@@ -69,6 +71,7 @@ int main(void) {
         }
       } else {
         printf("the data you recieved is: %s\n", buffer);
+        fflush(stdout);
         sprintf(buffer1,
                 "your data has been sent bitch, \n if you wanted to get a "
                 "value send 'value_array_x' where x below or equal to %i\n",
