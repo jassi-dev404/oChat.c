@@ -84,6 +84,7 @@ int main(void) {
         char *body =
             strstr(buffer, "\r\n\r\n"); // in http 2 blank lines mark the split
                                         // between headers and json data
+
         if (body != NULL) {
           body += 4; // this is so that we skip over the "\r\n\r\n"
           cJSON *text_coming = cJSON_Parse(body);
@@ -104,39 +105,76 @@ int main(void) {
                 (username->valuestring !=
                  NULL)) { // checks if msg and nickname exist and are not null
 
-              cJSON *entry = cJSON_CreateObject();
+              int is_clean = 1;
 
-              cJSON_AddStringToObject(entry, "msg", msg_field->valuestring);
-              cJSON_AddStringToObject(entry, "nickname", username->valuestring);
-              cJSON_AddStringToObject(
-                  entry, "IP",
-                  client_ip); // appends msg, nickname, ip and their respective
-                              // values to a new line in json file
-
-              char *json_file_to_save = cJSON_PrintUnformatted(entry);
-              FILE *db = fopen("entire_chat.json",
-                               "r+"); // opens the "database" to add data to
-
-              if (db != NULL) {
-                fseek(db, -1, SEEK_END);
-                if (fgetc(db) == ']') { // checks if last value is "[" or not
-                  long current_size = ftell(db); // stores old size of json file
-                  int raw_fd = fileno(db);       // gets file id
-                  ftruncate(
-                      raw_fd,
-                      current_size -
-                          1); // reduces file by 1 byte which deletes the "["
+              FILE *swear = fopen("swears.json", "r");
+              if (swear != NULL) {
+                char line[1024];
+                while (fgets(line, sizeof(line), swear)) {
+                  cJSON *json = cJSON_Parse(line);
+                  if (json) {
+                    cJSON *item =
+                        cJSON_GetObjectItemCaseSensitive(json, "word");
+                    if (cJSON_IsString(item) && item->valuestring) {
+                      // saves each swear word in the string
+                      if (strstr(msg_field->valuestring, item->valuestring) !=
+                              NULL ||
+                          strstr(username->valuestring, item->valuestring) !=
+                              NULL) {
+                        is_clean = 0;
+                        cJSON_Delete(json);
+                        break;
+                      }
+                    }
+                    cJSON_Delete(json);
+                  }
                 }
-                fseek(db, 0, SEEK_END);
-                fprintf(db, ",\n%s\n]", json_file_to_save); // if db does exist
-                fclose(db);
+                fclose(swear);
               }
-              free(json_file_to_save);
-              cJSON_Delete(entry);
-              const char *success =
-                  "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: "
-                  "*\r\n\r\nmessage_recorded :)";
-              send(abcd, success, strlen(success), 0);
+
+              if (is_clean == 0) {
+                // sends message to website that user entered no no stuff
+                const char *close = "HTTP/1.1 200 OK\r\n"
+                                    "Access-Control-Allow-Origin: *\r\n"
+                                    "Content-Type: application/json\r\n"
+                                    "\r\n"
+                                    "{\"msg\": \"reload_website\"}";
+                send(abcd, close, strlen(close), 0);
+              } else {
+                cJSON *entry = cJSON_CreateObject();
+
+                cJSON_AddStringToObject(entry, "msg", msg_field->valuestring);
+                cJSON_AddStringToObject(entry, "nickname",
+                                        username->valuestring);
+                cJSON_AddStringToObject(entry, "IP", client_ip);
+
+                char *json_file_to_save = cJSON_PrintUnformatted(entry);
+                FILE *db = fopen("entire_chat.json",
+                                 "r+"); // opens the "database" to add data to
+
+                if (db != NULL) {
+                  fseek(db, -1, SEEK_END);
+                  if (fgetc(db) == ']') { // checks if last value is "[" or not
+                    long current_size =
+                        ftell(db);           // stores old size of json file
+                    int raw_fd = fileno(db); // gets file id
+                    ftruncate(
+                        raw_fd,
+                        current_size -
+                            1); // reduces file by 1 byte which deletes the "["
+                  }
+                  fseek(db, 0, SEEK_END);
+                  fprintf(db, ",\n%s\n]",
+                          json_file_to_save); // if db does exist
+                  fclose(db);
+                }
+                free(json_file_to_save);
+                cJSON_Delete(entry);
+                const char *success =
+                    "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: "
+                    "*\r\n\r\nmessage_recorded :)";
+                send(abcd, success, strlen(success), 0);
+              }
             }
             cJSON_Delete(text_coming);
           }
@@ -147,9 +185,9 @@ int main(void) {
         FILE *db = fopen("entire_chat.json", "r");
         if (db == NULL) {
           const char *nothing =
-              "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: "
-              "*\r\nContent-Type: application/json\r\n\r\nnothing exists man "
-              "go check"; // sends this if db is nothing/empty
+              "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n"
+              "Content-Type: application/json\r\n\r\n[]"; // sends this if db is
+                                                          // nothing/empty
           send(abcd, nothing, strlen(nothing), 0);
         } else {
           const char *stupid_http_header = "HTTP/1.1 200 OK\r\n"
@@ -163,8 +201,8 @@ int main(void) {
           long db_size = ftell(db); // gets db_size
           rewind(db);
           char *buffer_for_db =
-              malloc(db_size);                 // makes a buffer same size as db
-          fread(buffer_for_db, 1, db_size, db); // loads entire db into ram
+              malloc(db_size); // makes a buffer same size as db
+          fread(buffer_for_db, 1, db_size, db);  // loads entire db into ram
           send(abcd, buffer_for_db, db_size, 0); // sends the db to the frontend
           free(buffer_for_db); // so that server does not crash
           fclose(db);

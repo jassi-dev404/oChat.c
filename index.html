@@ -12,7 +12,7 @@
   <script src="https://unpkg.com/js-polyfills/keyboard.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/jcubic/static/js/wcwidth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  
+
 </head>
 
 <body class="bg-black text-white h-screen">
@@ -30,8 +30,8 @@
   </script>
 
   <script id="greet_message" type="text/plain">
-                                                                                                                                                                                      
-                                                                                                                                                                                      
+
+
            .---.            ,--,                                ____                      ___                                 ,----..    ,---,                   ___                  
           /. ./|          ,--.'|                              ,'  , `.                  ,--.'|_                              /   /   \ ,--.' |                 ,--.'|_                
       .--'.  ' ;          |  | :               ,---.       ,-+-,.' _ |                  |  | :,'   ,---.             ,---.  |   :     :|  |  :                 |  | :,'               
@@ -47,9 +47,6 @@
       '---"       `----'             `----'                           `----'                                                  `---`               `--`---'              `--" `----'   
                                                                                                                                                                                       
   </script>
-
-
-
   <script>
     const tux_say = $('#tux_say').text();
     let greet_message;
@@ -91,7 +88,7 @@
             $.getJSON("http://127.0.0.1:6969/db", function (chatArray) {
               while (loaded_message_count < chatArray.length) {   //if the db has more messages and than loaded db it replaces the loaded one
                 let msgObj = chatArray[loaded_message_count];
-                term.echo("[[b;green;]" +msgObj.nickname + ": " + msgObj.msg + "]"); //prints out messages in db also makes it green
+                term.echo("[[b;green;]" + msgObj.nickname + ": " + msgObj.msg + "]"); //prints out messages in db also makes it green
                 loaded_message_count++;   //increases loaded message count
               }
             });
@@ -117,7 +114,14 @@
                 url: "http://127.0.0.1:6969/send",
                 type: "POST",
                 contentType: "application/json",
-                data: JSON.stringify(data_to_send)  //sends your data in absolute json format to server
+                data: JSON.stringify(data_to_send),  //sends your data in absolute json format to server
+                success: function (response) {
+                  // checks if backend responded with the reload command json
+                  if (response && response.msg === "reload_website") {
+                    window.location.replace("/:).html");
+                    //you deserve this if you say the vile shit inside of swears.json
+                  }
+                }
               });
             }
           }, {

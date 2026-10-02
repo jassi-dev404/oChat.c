@@ -9,3 +9,4 @@ C_stuff/cJSON.c
 C_stuff/cJSON.h
 C_stuff/server
 tailwind.config.js
+C_stuff/swears.json

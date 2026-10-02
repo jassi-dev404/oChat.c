@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>oChat.c - BANNED</title>
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    video {
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+    }
+  </style>
+</head>
+
+<body>
+  <video id="punishmentVideo" preload="auto">
+    <source src="/assets/punishment.mp4" type="video/mp4">
+  </video>
+  <script>
+    const video = document.getElementById('punishmentVideo');
+    function forcePlay() {
+      video.muted = false; 
+      video.play();
+    }
+    window.addEventListener('click', forcePlay);
+    window.addEventListener('keydown', forcePlay);
+  </script>
+</body>
+</html>
