@@ -7,7 +7,8 @@
   <title>open cc</title>
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.47.0/js/jquery.terminal.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.47.0/css/jquery.terminal.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.47.0/css/jquery.terminal.min.css"
+    rel="stylesheet" />
   <script src="https://unpkg.com/js-polyfills/keyboard.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/jcubic/static/js/wcwidth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -15,18 +16,119 @@
 
 <body class="bg-black text-white h-screen">
 
-  <script>
-    $(document).ready(function () {
-      $('body').terminal({
-        hello: function (what) {
-          this.echo('Hello, ' + what + '. Welcome to this terminal.');
-        }
-      }, {
-        greetings: 'My First Web Terminal'
-      });
-    });
+  <script id="tux_say" type="text/plain">
+   \
+    \
+        .--.
+       |o_o |
+       |:_/ |
+      //   \ \
+     (|     | )
+    /'\_   _/`\
+    \___)=(___/
   </script>
 
+  <script id="greet_message" type="text/plain">
+           .---.            ,--,                                ____                      ___                        /   /   \                                           ,----..    ,----..   
+          /. ./|          ,--.'|                              ,'  , `.                  ,--.'|_                     /   .     : ,-.----.                                /   /   \  /   /   \  
+      .--'.  ' ;          |  | :               ,---.       ,-+-,.' _ |                  |  | :,'   ,---.           .   /   ;.  \\    /  \                ,---,         |   :     :|   :     : 
+     /__./ \ : |          :  : '              '   ,'\   ,-+-. ;   , ||                  :  : ' :  '   ,'\         .   ;   /  ` ;|   :    |           ,-+-. /  |        .   |  ;. /.   |  ;. / 
+ .--'.  '   \' .   ,---.  |  ' |      ,---.  /   /   | ,--.'|'   |  || ,---.          .;__,'  /  /   /   |        ;   |  ; \ ; ||   | .\ :   ,---.  ,--.'|'   |        .   ; /--` .   ; /--`  
+/___/ \ |    ' '  /     \ '  | |     /     \.   ; ,. :|   |  ,', |  |,/     \         |  |   |  .   ; ,. :        |   :  | ; | '.   : |: |  /     \|   |  ,"' |        ;   | ;    ;   | ;     
+;   \  \;      : /    /  ||  | :    /    / ''   | |: :|   | /  | |--'/    /  |        :__,'| :  '   | |: :        .   |  ' ' ' :|   |  \ : /    /  |   | /  | |        |   : |    |   : |     
+ \   ;  `      |.    ' / |'  : |__ .    ' / '   | .; :|   : |  | ,  .    ' / |          '  : |__'   | .; :        '   ;  \; /  ||   : .  |.    ' / |   | |  | |        .   | '___ .   | '___  
+  .   \    .\  ;'   ;   /||  | '.'|'   ; :__|   :    ||   : |  |/   '   ;   /|          |  | '.'|   :    |         \   \  ',  / :     |`-''   ;   /|   | |  |/         '   ; : .'|'   ; : .'| 
+   \   \   ' \ |'   |  / |;  :    ;'   | '.'|\   \  / |   | |`-'    '   |  / |          ;  :    ;\   \  /           ;   :    /  :   : :   '   |  / |   | |--'          '   | '/  :'   | '/  : 
+    :   '  |--" |   :    ||  ,   / |   :    : `----'  |   ;/        |   :    |          |  ,   /  `----'             \   \ .'   |   | :   |   :    |   |/              |   :    / |   :    /  
+     \   \ ;     \   \  /  ---`-'   \   \  /          '---'          \   \  /            ---`-'                       `---`     `---'.|    \   \  /'---'                \   \ .'   \   \ .'   
+      '---"       `----'             `----'                           `----'                                                      `---`     `----'                       `---`      `---`     
+  </script>
+
+
+
+  <script>
+    const tux_say = $('#tux_say').text();
+    let details = navigator.userAgent;
+    let regexp = /android|iphone|kindle|ipad/i;
+    let isMobileDevice = regexp.test(details);
+    let greet_message;
+    const sleep = ms => new Promise(resolve => {
+      setTimeout(
+        () => { resolve() },
+        ms
+      );
+    });
+    if (1397 > window.innerWidth) {
+      greet_message = "Welcome To Open CC";
+    }
+    else {
+      greet_message = $('#greet_message').text();
+    }
+    $('body').terminal(
+      {
+        tuxsay: function (what) {
+          let length = what.length;
+          let a = length + 2;
+          let b = "";
+          while (a != 0) {
+            b = b + "-";
+            a = a - 1;
+          }
+          if (length)
+            this.echo(" " + b + "\n" + "< " + what + " >" + "\n " + b + tux_say);
+        },
+        help: function () {
+          this.echo("all commands are:" + "\n tuxsay (to make tux say what you want)" + "\n help (to get list of all possible commands)" + "\n connect (to connect to everyone on open cc, requires nickname as argument)");
+        },
+        connect: function (nickname) {
+          let term = this;  //saves a version of the terminal
+          term.echo("connecting as " + nickname + " :)"); //lets user know they are connecting as their nickname
+
+          let loaded_message_count = 0; //this is so that we dont print the db every second 
+
+          let reload_chat = setInterval(function () {  //reloads_chat to get new messages every 2 seconds
+            $.getJSON("http://127.0.0.1:6969/db", function (chatArray) {
+              while (loaded_message_count < chatArray.length) {   //if the db has more messages and than loaded db it replaces the loaded one
+                let msgObj = chatArray[loaded_message_count];
+                term.echo("[[b;green;]" +msgObj.nickname + ": " + msgObj.msg + "]"); //prints out messages in db also makes it green
+                loaded_message_count++;   //increases loaded message count
+              }
+            });
+          }, 2000);
+
+          term.echo("// we are connected, type your message and press enter to send, send /exit to quit");
+
+          term.push(function (user_input) { //user input means the message you entered
+            if (user_input === '/exit') {
+              clearInterval(reload_chat);  //quits connect function
+              term.pop();
+              term.echo("disconnected, send 'connect <nickname>' again to connect");
+              return;
+            }
+
+            if (user_input !== '') {
+              let data_to_send = {    //stores the your input in data_to_send as json-ish format
+                msg: user_input,
+                nickname: nickname
+              };
+
+              $.ajax({
+                url: "http://127.0.0.1:6969/send",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data_to_send)  //sends your data in absolute json format to server
+              });
+            }
+          }, {
+            prompt: nickname + '> ' //adds your nickname to the prompt since cool :)
+          });
+        }
+      },
+      {
+        greetings: greet_message + "\n type 'help' to get list of all possible commands"
+      }
+    );
+  </script>
 </body>
 
 </html>

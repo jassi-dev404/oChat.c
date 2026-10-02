@@ -119,10 +119,13 @@ int main(void) {
 
               if (db != NULL) {
                 fseek(db, -1, SEEK_END);
-                if (fgetc(db) == ']') { //checks if last value is "[" or not
-                  long current_size = ftell(db);  //stores old size of json file
-                  int raw_fd = fileno(db);  //gets file id 
-                  ftruncate(raw_fd, current_size - 1); //reduces file by 1 byte which deletes the "["
+                if (fgetc(db) == ']') { // checks if last value is "[" or not
+                  long current_size = ftell(db); // stores old size of json file
+                  int raw_fd = fileno(db);       // gets file id
+                  ftruncate(
+                      raw_fd,
+                      current_size -
+                          1); // reduces file by 1 byte which deletes the "["
                 }
                 fseek(db, 0, SEEK_END);
                 fprintf(db, ",\n%s\n]", json_file_to_save); // if db does exist
@@ -137,6 +140,34 @@ int main(void) {
             }
             cJSON_Delete(text_coming);
           }
+        }
+      } else if (strcmp(method, "GET") == 0 &&
+                 strcmp(path,
+                        "/db") == 0) { // checks if method = GET and path = /db
+        FILE *db = fopen("entire_chat.json", "r");
+        if (db == NULL) {
+          const char *nothing =
+              "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: "
+              "*\r\nContent-Type: application/json\r\n\r\nnothing exists man "
+              "go check"; // sends this if db is nothing/empty
+          send(abcd, nothing, strlen(nothing), 0);
+        } else {
+          const char *stupid_http_header = "HTTP/1.1 200 OK\r\n"
+                                           "Access-Control-Allow-Origin: *\r\n"
+                                           "Content-Type: application/json\r\n"
+                                           "Connection: close\r\n"
+                                           "\r\n";
+          send(abcd, stupid_http_header, strlen(stupid_http_header),
+               0); // sends the stupid headers to frontend
+          fseek(db, 0, SEEK_END);
+          long db_size = ftell(db); // gets db_size
+          rewind(db);
+          char *buffer_for_db =
+              malloc(db_size);                 // makes a buffer same size as db
+          fread(buffer_for_db, 1, db_size, db); // loads entire db into ram
+          send(abcd, buffer_for_db, db_size, 0); // sends the db to the frontend
+          free(buffer_for_db); // so that server does not crash
+          fclose(db);
         }
       }
       // zeroes buffer
