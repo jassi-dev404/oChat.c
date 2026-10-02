@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,28 +11,88 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#define BUFFER_SIZE 32768 // buffer got way bigger because the internet sends
+                           // stuff in many tiny chunks instead of all at once
+                           // like localhost does
+
+// reads the whole request instead of trusting a single recv call, over the
+// network one recv can hold half the headers or cut a message in half
+static ssize_t read_request(int fd, char *buf, size_t size) {
+  size_t total = 0;
+
+  while (total + 1 < size) {
+    ssize_t bytes_got = recv(fd, buf + total, size - 1 - total, 0);
+    if (bytes_got <= 0) { // client hung up or errored, use whatever we got
+      break;
+    }
+    total += bytes_got;
+
+    char *headers_end = strstr(buf, "\r\n\r\n");
+    if (headers_end != NULL) {
+      size_t headers_size = (size_t)(headers_end - buf) + 4;
+      long body_size = 0;
+      char *length_header = strstr(buf, "Content-Length:");
+      if (length_header != NULL && length_header < headers_end) {
+        body_size = atol(length_header + 15); // 15 is strlen of the header name
+      }
+      if (total >= headers_size + (size_t)body_size) {
+        break; // we already have the headers and the whole json body
+      }
+    }
+  }
+
+  buf[total] = '\0';
+  return (ssize_t)total;
+}
+
 int main(void) {
   struct sockaddr_in addr;
-  char buffer[1000];                         // makes buffer for stuff
-  char buffer1[1000];                        // makes struct for stuff
-  char buffer2[1000];                        // makes struct for stuff
+  struct sockaddr_in client_addr;
+  char buffer[BUFFER_SIZE];                  // makes buffer for stuff
+  char buffer1[BUFFER_SIZE];                 // makes struct for stuff
+  char buffer2[BUFFER_SIZE];                 // makes struct for stuff
   int abc = socket(AF_INET, SOCK_STREAM, 0); // makes socket
+
+  int reuse = 1; // lets the server restart instantly instead of complaining
+                  // that the port is still in use (nest restarts it a lot)
+  setsockopt(abc, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+
+  const char *port_from_env = getenv("PORT"); // nest hands us a port to use
+  int port_to_listen_on =
+      (port_from_env != NULL) ? atoi(port_from_env)
+                              : 6969; // falls back to the old port when unset
+
+  const char *db_path = getenv("OCHAT_DB"); // lets us find the json files even
+  if (db_path == NULL) {                    // when nest starts us from another
+    db_path = "entire_chat.json";           // working folder
+  }
+  const char *swears_path = getenv("OCHAT_SWEARS"); // same idea for swears
+  if (swears_path == NULL) {
+    swears_path = "swears.json";
+  }
+
   addr.sin_family = AF_INET; // saves data of socket in the struct
-  addr.sin_port = htons(6969);
-  addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+  addr.sin_port = htons((uint16_t)port_to_listen_on);
+  addr.sin_addr.s_addr = INADDR_ANY; // 0.0.0.0 so the whole internet can knock
   memset(&(addr.sin_zero), '\0',
-         8); // zeroes out all the buffers and a part of the struct
-  memset(buffer, '\0', 1000);
-  memset(buffer1, '\0', 1000);
-  memset(buffer2, '\0', 1000);
+         sizeof(addr.sin_zero)); // zeroes out all the buffers and a part of the struct
+  memset(buffer, '\0', sizeof(buffer));
+  memset(buffer1, '\0', sizeof(buffer1));
+  memset(buffer2, '\0', sizeof(buffer2));
+
+  printf("oChat.c server listening on 0.0.0.0:%d (db: %s)\n", port_to_listen_on,
+         db_path);
+
   char random_int = bind(abc, (struct sockaddr *)&addr,
                          sizeof(addr)); // binds the stuff used random_int
                                         // because program crashed otherwise
-  listen(abc, 10); // listens for stuff connect to socket abc
+  listen(abc, 64); // listens for stuff connect to socket abc
   int i = 1;       // makes i for infinite while loop
   const char *text_to_be_sent = "idk"; // initialises stuff to be sent
-
-  struct sockaddr_in client_addr;
+  if (random_int < 0) {
+    perror("bind");
+    return 1;
+  }
   socklen_t client_len = sizeof(client_addr);
 
   int array[] = {25, 50, 75, 100}; // makes array which has stuff
@@ -51,15 +112,21 @@ int main(void) {
 
     ssize_t are_we_online_rn; // initialises a ssize_t
 
-    if ((are_we_online_rn = recv(abcd, buffer, sizeof(buffer) - 1,
-                                 0)) > // while connected online
-        0) {
+    are_we_online_rn = read_request(abcd, buffer,
+                                   sizeof(buffer)); // while connected online
+
+    if (are_we_online_rn > 0) {
 
       // zeroes out buffer value
       buffer[are_we_online_rn] = '\0';
 
       char method[16], path[256];
       sscanf(buffer, "%s %s", method, path);
+
+      char *query = strpbrk(path, "?#"); // drops ?query stuff off the path
+      if (query != NULL) {
+        *query = '\0';
+      }
 
       if (strcmp(method, "OPTIONS") ==
           0) { // checks if method is equal to OPTIONS
@@ -70,6 +137,9 @@ int main(void) {
                                                  // using llm
             "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
             "Access-Control-Allow-Headers: Content-Type\r\n"
+            "Access-Control-Max-Age: 86400\r\n" // browsers remember this for a
+                                                   // day so they stop asking
+                                                   // before every single message
             "Content-Length: 0\r\n"
             "Connection: close\r\n"
             "\r\n";
@@ -107,7 +177,7 @@ int main(void) {
 
               int is_clean = 1;
 
-              FILE *swear = fopen("swears.json", "r");
+              FILE *swear = fopen(swears_path, "r");
               if (swear != NULL) {
                 char line[1024];
                 while (fgets(line, sizeof(line), swear)) {
@@ -149,7 +219,7 @@ int main(void) {
                 cJSON_AddStringToObject(entry, "IP", client_ip);
 
                 char *json_file_to_save = cJSON_PrintUnformatted(entry);
-                FILE *db = fopen("entire_chat.json",
+                FILE *db = fopen(db_path,
                                  "r+"); // opens the "database" to add data to
 
                 if (db != NULL) {
@@ -179,10 +249,19 @@ int main(void) {
             cJSON_Delete(text_coming);
           }
         }
+      } else if (strcmp(method, "GET") == 0 && strcmp(path, "/") == 0) {
+        // a tiny hello so you can check the server is alive from a browser
+        const char *hello =
+            "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n"
+            "Content-Type: application/json\r\n"
+            "Connection: close\r\n"
+            "\r\n"
+            "{\"msg\": \"oChat.c server is alive :)\"}";
+        send(abcd, hello, strlen(hello), 0);
       } else if (strcmp(method, "GET") == 0 &&
                  strcmp(path,
                         "/db") == 0) { // checks if method = GET and path = /db
-        FILE *db = fopen("entire_chat.json", "r");
+        FILE *db = fopen(db_path, "r");
         if (db == NULL) {
           const char *nothing =
               "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n"
@@ -209,9 +288,9 @@ int main(void) {
         }
       }
       // zeroes buffer
-      memset(buffer, '\0', 1000);
-      memset(buffer1, '\0', 1000);
-      memset(buffer2, '\0', 1000);
+      memset(buffer, '\0', sizeof(buffer));
+      memset(buffer1, '\0', sizeof(buffer1));
+      memset(buffer2, '\0', sizeof(buffer2));
     }
     close(abcd); // closes *everything*
   }

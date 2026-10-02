@@ -49,6 +49,17 @@
   </script>
   <script>
     const tux_say = $('#tux_say').text();
+
+    const C_SERVER = "jassi-404.hackclub.app";
+    const LOCAL_SERVER = "http://127.0.0.1:6969";
+
+    const server_from_url =
+      new URLSearchParams(window.location.search).get("server");
+    const page_is_local =
+      ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
+    const SERVER =
+      server_from_url || (page_is_local ? LOCAL_SERVER : C_SERVER);
+
     let greet_message;
     const sleep = ms => new Promise(resolve => {
       setTimeout(
@@ -83,13 +94,26 @@
           term.echo("connecting as " + nickname + " :)"); //lets user know they are connecting as their nickname
 
           let loaded_message_count = 0; //this is so that we dont print the db every second 
+          let told_about_error = false; //this is so we only complain once instead of every 2 seconds
 
           let reload_chat = setInterval(function () {  //reloads_chat to get new messages every 2 seconds
-            $.getJSON("http://127.0.0.1:6969/db", function (chatArray) {
-              while (loaded_message_count < chatArray.length) {   //if the db has more messages and than loaded db it replaces the loaded one
-                let msgObj = chatArray[loaded_message_count];
-                term.echo("[[b;green;]" + msgObj.nickname + ": " + msgObj.msg + "]"); //prints out messages in db also makes it green
-                loaded_message_count++;   //increases loaded message count
+            $.ajax({
+              url: SERVER + "/db",
+              dataType: "json",
+              success: function (chatArray) {   //only runs when the server actually answered
+                told_about_error = false;
+                while (loaded_message_count < chatArray.length) {   //if the db has more messages and than loaded db it replaces the loaded one
+                  let msgObj = chatArray[loaded_message_count];
+                  term.echo("[[b;green;]" + msgObj.nickname + ": " + msgObj.msg + "]"); //prints out messages in db also makes it green
+                  loaded_message_count++;   //increases loaded message count
+                }
+              },
+              error: function () {  //this runs when the C server is unreachable
+                if (told_about_error == false) {
+                  told_about_error = true;
+                  term.echo("[[b;red;]cannot reach the server at " + SERVER + "]");
+                  term.echo("[[b;red;]is the C server running, and is that url correct?]");
+                }
               }
             });
           }, 2000);
@@ -111,7 +135,7 @@
               };
 
               $.ajax({
-                url: "http://127.0.0.1:6969/send",
+                url: SERVER + "/send",
                 type: "POST",
                 contentType: "application/json",
                 data: JSON.stringify(data_to_send),  //sends your data in absolute json format to server
