@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>open cc</title>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.47.0/js/jquery.terminal.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.47.0/css/jquery.terminal.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/js-polyfills/keyboard.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/jcubic/static/js/wcwidth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="bg-black text-white h-screen">
+
+  <script>
+    $(document).ready(function () {
+      $('body').terminal({
+        hello: function (what) {
+          this.echo('Hello, ' + what + '. Welcome to this terminal.');
+        }
+      }, {
+        greetings: 'My First Web Terminal'
+      });
+    });
+  </script>
+
+</body>
+
+</html>

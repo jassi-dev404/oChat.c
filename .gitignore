@@ -4,3 +4,8 @@ main
 *.pdf
 .DS_Store
 a.out
+.vscode/settings.json
+C_stuff/cJSON.c
+C_stuff/cJSON.h
+C_stuff/server
+tailwind.config.js
