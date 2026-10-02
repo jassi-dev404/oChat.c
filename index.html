@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>open cc</title>
+  <title>oChat.c</title>
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.47.0/js/jquery.terminal.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.47.0/css/jquery.terminal.min.css"
@@ -12,6 +12,7 @@
   <script src="https://unpkg.com/js-polyfills/keyboard.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/jcubic/static/js/wcwidth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
 </head>
 
 <body class="bg-black text-white h-screen">
@@ -29,28 +30,28 @@
   </script>
 
   <script id="greet_message" type="text/plain">
-           .---.            ,--,                                ____                      ___                        /   /   \                                           ,----..    ,----..   
-          /. ./|          ,--.'|                              ,'  , `.                  ,--.'|_                     /   .     : ,-.----.                                /   /   \  /   /   \  
-      .--'.  ' ;          |  | :               ,---.       ,-+-,.' _ |                  |  | :,'   ,---.           .   /   ;.  \\    /  \                ,---,         |   :     :|   :     : 
-     /__./ \ : |          :  : '              '   ,'\   ,-+-. ;   , ||                  :  : ' :  '   ,'\         .   ;   /  ` ;|   :    |           ,-+-. /  |        .   |  ;. /.   |  ;. / 
- .--'.  '   \' .   ,---.  |  ' |      ,---.  /   /   | ,--.'|'   |  || ,---.          .;__,'  /  /   /   |        ;   |  ; \ ; ||   | .\ :   ,---.  ,--.'|'   |        .   ; /--` .   ; /--`  
-/___/ \ |    ' '  /     \ '  | |     /     \.   ; ,. :|   |  ,', |  |,/     \         |  |   |  .   ; ,. :        |   :  | ; | '.   : |: |  /     \|   |  ,"' |        ;   | ;    ;   | ;     
-;   \  \;      : /    /  ||  | :    /    / ''   | |: :|   | /  | |--'/    /  |        :__,'| :  '   | |: :        .   |  ' ' ' :|   |  \ : /    /  |   | /  | |        |   : |    |   : |     
- \   ;  `      |.    ' / |'  : |__ .    ' / '   | .; :|   : |  | ,  .    ' / |          '  : |__'   | .; :        '   ;  \; /  ||   : .  |.    ' / |   | |  | |        .   | '___ .   | '___  
-  .   \    .\  ;'   ;   /||  | '.'|'   ; :__|   :    ||   : |  |/   '   ;   /|          |  | '.'|   :    |         \   \  ',  / :     |`-''   ;   /|   | |  |/         '   ; : .'|'   ; : .'| 
-   \   \   ' \ |'   |  / |;  :    ;'   | '.'|\   \  / |   | |`-'    '   |  / |          ;  :    ;\   \  /           ;   :    /  :   : :   '   |  / |   | |--'          '   | '/  :'   | '/  : 
-    :   '  |--" |   :    ||  ,   / |   :    : `----'  |   ;/        |   :    |          |  ,   /  `----'             \   \ .'   |   | :   |   :    |   |/              |   :    / |   :    /  
-     \   \ ;     \   \  /  ---`-'   \   \  /          '---'          \   \  /            ---`-'                       `---`     `---'.|    \   \  /'---'                \   \ .'   \   \ .'   
-      '---"       `----'             `----'                           `----'                                                      `---`     `----'                       `---`      `---`     
+                                                                                                                                                                                      
+                                                                                                                                                                                      
+           .---.            ,--,                                ____                      ___                                 ,----..    ,---,                   ___                  
+          /. ./|          ,--.'|                              ,'  , `.                  ,--.'|_                              /   /   \ ,--.' |                 ,--.'|_                
+      .--'.  ' ;          |  | :               ,---.       ,-+-,.' _ |                  |  | :,'   ,---.             ,---.  |   :     :|  |  :                 |  | :,'               
+     /__./ \ : |          :  : '              '   ,'\   ,-+-. ;   , ||                  :  : ' :  '   ,'\           '   ,'\ .   |  ;. /:  :  :                 :  : ' :               
+ .--'.  '   \' .   ,---.  |  ' |      ,---.  /   /   | ,--.'|'   |  || ,---.          .;__,'  /  /   /   |         /   /   |.   ; /--` :  |  |,--.  ,--.--.  .;__,'  /        ,---.   
+/___/ \ |    ' '  /     \ '  | |     /     \.   ; ,. :|   |  ,', |  |,/     \         |  |   |  .   ; ,. :        .   ; ,. :;   | ;    |  :  '   | /       \ |  |   |        /     \  
+;   \  \;      : /    /  ||  | :    /    / ''   | |: :|   | /  | |--'/    /  |        :__,'| :  '   | |: :        '   | |: :|   : |    |  |   /' :.--.  .-. |:__,'| :       /    / '  
+ \   ;  `      |.    ' / |'  : |__ .    ' / '   | .; :|   : |  | ,  .    ' / |          '  : |__'   | .; :        '   | .; :.   | '___ '  :  | | | \__\/: . .  '  : |__    .    ' /   
+  .   \    .\  ;'   ;   /||  | '.'|'   ; :__|   :    ||   : |  |/   '   ;   /|          |  | '.'|   :    |        |   :    |'   ; : .'||  |  ' | : ," .--.; |  |  | '.'|   '   ; :__  
+   \   \   ' \ |'   |  / |;  :    ;'   | '.'|\   \  / |   | |`-'    '   |  / |          ;  :    ;\   \  /          \   \  / '   | '/  :|  :  :_:,'/  /  ,.  |  ;  :    ;___'   | '.'| 
+    :   '  |--" |   :    ||  ,   / |   :    : `----'  |   ;/        |   :    |          |  ,   /  `----'            `----'  |   :    / |  | ,'   ;  :   .'   \ |  ,   //  .\   :    : 
+     \   \ ;     \   \  /  ---`-'   \   \  /          '---'          \   \  /            ---`-'                              \   \ .'  `--''     |  ,     .-./  ---`-' \  ; \   \  /  
+      '---"       `----'             `----'                           `----'                                                  `---`               `--`---'              `--" `----'   
+                                                                                                                                                                                      
   </script>
 
 
 
   <script>
     const tux_say = $('#tux_say').text();
-    let details = navigator.userAgent;
-    let regexp = /android|iphone|kindle|ipad/i;
-    let isMobileDevice = regexp.test(details);
     let greet_message;
     const sleep = ms => new Promise(resolve => {
       setTimeout(
@@ -58,8 +59,8 @@
         ms
       );
     });
-    if (1397 > window.innerWidth) {
-      greet_message = "Welcome To Open CC";
+    if (1335 > window.innerWidth) {
+      greet_message = "Welcome To oChat.c";
     }
     else {
       greet_message = $('#greet_message').text();
@@ -78,7 +79,7 @@
             this.echo(" " + b + "\n" + "< " + what + " >" + "\n " + b + tux_say);
         },
         help: function () {
-          this.echo("all commands are:" + "\n tuxsay (to make tux say what you want)" + "\n help (to get list of all possible commands)" + "\n connect (to connect to everyone on open cc, requires nickname as argument)");
+          this.echo("all commands are:" + "\n tuxsay (to make tux say what you want)" + "\n help (to get list of all possible commands)" + "\n connect (to connect to everyone on oChat.c, requires nickname as argument)");
         },
         connect: function (nickname) {
           let term = this;  //saves a version of the terminal
