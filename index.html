@@ -108,11 +108,16 @@
                   loaded_message_count++;   //increases loaded message count
                 }
               },
-              error: function () {  //this runs when the C server is unreachable
+              error: function (xhr) {  //this runs when something went wrong
                 if (told_about_error == false) {
                   told_about_error = true;
-                  term.echo("[[b;red;]cannot reach the server at " + SERVER + "]");
-                  term.echo("[[b;red;]is the C server running, and is that url correct?]");
+                  if (xhr.status == 0) { //status 0 means the server never answered
+                    term.echo("[[b;red;]cannot reach the server at " + SERVER + "]");
+                    term.echo("[[b;red;]is the C server running, and is that url correct?]");
+                  } else { //it answered, but what it sent was not valid json
+                    term.echo("[[b;red;]the server answered (code " + xhr.status + ") but with broken json]");
+                    term.echo("[[b;red;]the database file is probably corrupted]");
+                  }
                 }
               }
             });
