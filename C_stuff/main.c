@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -107,6 +108,14 @@ int main(void) {
       return 1;                      // crashes
     }
 
+    struct timeval give_up_waiting = {
+      1, 0}; // browsers leave sockets open without saying anything (they
+             // preconnect and keep them warm), and this server only handles
+             // one client at a time so one lazy socket used to freeze the
+             // whole chat until the browser decided to close it
+    setsockopt(abcd, SOL_SOCKET, SO_RCVTIMEO, &give_up_waiting,
+               sizeof(give_up_waiting));
+
     char *client_ip =
         inet_ntoa(client_addr.sin_addr); // takes client's ip to store
 
@@ -161,7 +170,8 @@ int main(void) {
           if (text_coming == NULL) {
             const char *error =
                 "HTTP/1.1 400 Bad Request\r\nAccess-Control-Allow-Origin: "
-                "*\r\n\r\nInvalid Text Message/JSON Error lol idk :)";
+                "*\r\nConnection: close\r\n\r\nInvalid Text Message/JSON Error "
+                "lol idk :)";
             send(abcd, error, strlen(error),
                  0); // sends error if json has some issue
           } else {
@@ -207,6 +217,7 @@ int main(void) {
                 const char *close = "HTTP/1.1 200 OK\r\n"
                                     "Access-Control-Allow-Origin: *\r\n"
                                     "Content-Type: application/json\r\n"
+                                    "Connection: close\r\n"
                                     "\r\n"
                                     "{\"msg\": \"reload_website\"}";
                 send(abcd, close, strlen(close), 0);
@@ -242,7 +253,7 @@ int main(void) {
                 cJSON_Delete(entry);
                 const char *success =
                     "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: "
-                    "*\r\n\r\nmessage_recorded :)";
+                    "*\r\nConnection: close\r\n\r\nmessage_recorded :)";
                 send(abcd, success, strlen(success), 0);
               }
             }
