@@ -234,19 +234,38 @@ int main(void) {
                                  "r+"); // opens the "database" to add data to
 
                 if (db != NULL) {
-                  fseek(db, -1, SEEK_END);
-                  if (fgetc(db) == ']') { // checks if last value is "[" or not
-                    long current_size =
-                        ftell(db);           // stores old size of json file
-                    int raw_fd = fileno(db); // gets file id
-                    ftruncate(
-                        raw_fd,
-                        current_size -
-                            1); // reduces file by 1 byte which deletes the "["
+                  fseek(db, 0, SEEK_END);
+                  long db_end = ftell(db);  // how big the "database" is
+                  long bracket_at = -1;     // where the closing "["... sorry "]" is
+                  long look = db_end;
+                  while (look > 0) {       // walks backwards from the end of
+                    look--;                 // the file so it can find the "]"
+                    fseek(db, look, SEEK_SET);
+                    int here = fgetc(db);
+                    if (here == ']') {
+                      bracket_at = look;
+                      break;
+                    }
+                    if (here != '\n' && here != '\r' && here != ' ' &&
+                        here != '\t') {
+                      break; // some real json is in the way, give up
+                    }
+                  }
+                  int raw_fd = fileno(db); // gets file id
+                  if (bracket_at >= 0) {
+                    ftruncate(raw_fd, bracket_at); // removes the "]" and
+                                                    // anything after it, even
+                                                    // stray newlines, which
+                                                    // used to break the file
                   }
                   fseek(db, 0, SEEK_END);
-                  fprintf(db, ",\n%s\n]",
-                          json_file_to_save); // if db does exist
+                  if (bracket_at < 0) {
+                    fprintf(db, "[\n%s\n]",
+                            json_file_to_save); // empty db, so start the array
+                  } else {
+                    fprintf(db, ",\n%s\n]",
+                            json_file_to_save); // if db does exist
+                  }
                   fclose(db);
                 }
                 free(json_file_to_save);
