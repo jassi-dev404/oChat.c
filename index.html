@@ -10,7 +10,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.terminal/2.47.0/css/jquery.terminal.min.css"
     rel="stylesheet" />
   <meta property="og:type" content="website" />
-    <link rel="icon" type="image/x-icon" href="/assets/oChatc.webp">
+  <link rel="icon" type="image/x-icon" href="/assets/oChatc.webp">
   <!---  meta tags for some kewl embed features --->
   <meta property="og:url" content="https://ochatc.jassi.dev/" />
   <meta property="og:title" content="Yes its me jassi, this is my super ultra mega cool chatting website" />
@@ -37,7 +37,6 @@
     /'\_   _/`\
     \___)=(___/
   </script>
-
   <script id="greet_message" type="text/plain">
 
 
@@ -114,6 +113,22 @@
                 while (loaded_message_count < chatArray.length) {   //if the db has more messages and than loaded db it replaces the loaded one
                   let msgObj = chatArray[loaded_message_count];
                   term.echo("[[b;green;]" + msgObj.nickname + ": " + msgObj.msg + "]"); //prints out messages in db also makes it green
+                  if (msgObj.msg.startsWith("tuxsay ")) {
+                    let tuxsays = response.slice(7);
+                    let length = tuxsays.length;
+                    let a = length + 2;
+                    let b = "";
+                    while (a != 0) {
+                      b = b + "-";
+                      a = a - 1;
+                    }
+                    if (length)
+                      this.echo(" " + b + "\n" + "< " + what + " >" + "\n " + b + tux_say);
+                  }
+                  if (msgObj.msg.includes(":sob:")) {
+                    this.echo($('<img src="https://ochatc.jassi.dev/emojis_and_stuff/sob.png">'));
+                  }
+
                   loaded_message_count++;   //increases loaded message count
                 }
               },
@@ -159,6 +174,7 @@
                     window.location.replace("/:).html");
                     //you deserve this if you say the vile shit inside of swears.json
                   }
+
                 }
               });
             }
