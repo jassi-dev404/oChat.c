@@ -123,10 +123,10 @@
                       a = a - 1;
                     }
                     if (length)
-                      this.echo(" " + b + "\n" + "< " + tuxsays + " >" + "\n " + b + tux_say);
+                      term.echo(" " + b + "\n" + "< " + tuxsays + " >" + "\n " + b + tux_say);
                   }
                   if (msgObj.msg.includes(":sob:")) {
-                    this.echo($('<img src="https://ochatc.jassi.dev/emojis_and_stuff/sob.png">'));
+                    term.echo($('<img src="https://ochatc.jassi.dev/emojis_and_stuff/sob.png">'));
                   }
 
                   loaded_message_count++;   //increases loaded message count
