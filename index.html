@@ -95,7 +95,10 @@
             this.echo(" " + b + "\n" + "< " + what + " >" + "\n " + b + tux_say);
         },
         help: function () {
-          this.echo("all commands are:" + "\n tuxsay (to make tux say what you want)" + "\n help (to get list of all possible commands)" + "\n connect (to connect to everyone on oChat.c, requires nickname as argument)");
+          this.echo("all commands are:" + "\n tuxsay (to make tux say what you want)" + "\n help (to get list of all possible commands)" + "\n connect (to connect to everyone on oChat.c, requires nickname as argument)" + "\n btw type 'emojis' to get all list of emojis and 'tuxsay' now works when connected to oChat.c");
+        },
+        emojis: function () {
+          this.echo(":sob:" + "\n :funni:")
         },
         connect: function (nickname) {
           let term = this;  //saves a version of the terminal
@@ -128,7 +131,9 @@
                   if (msgObj.msg.includes(":sob:")) {
                     term.echo($('<img src="https://ochatc.jassi.dev/emojis_and_stuff/sob.png">'));
                   }
-
+                  if (msgObj.msg.includes(":funni:")) {
+                    term.echo($('<img src="https://ochatc.jassi.dev/emojis_and_stuff/funni.png">'));
+                  }
                   loaded_message_count++;   //increases loaded message count
                 }
               },

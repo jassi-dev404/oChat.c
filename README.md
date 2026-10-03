@@ -30,4 +30,5 @@
 
 
 > Credits to Nox For The Amazing Logo <br>
+> Go Type "abc123cool" While Connected For A Surprise :) <br>
 > thats it, jassi out :)
