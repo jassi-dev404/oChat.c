@@ -19,7 +19,7 @@
 ### How to use On Local Machine
 
 
-   > You Can Download The Repository And Run `build.sh` && `python3 -m http.server 6967` So That You Can Have A Working Version Of The Website At http://localhost:6967/ (funni number :P ) <br> <br> also  Tux Has Somethings To Say: <br>
+   > You Can Download The Repository And Run `build.sh` && `python3 -m http.server 6967` So That You Can Have A Working Version Of The Website At http://localhost:6967/ (you might need to change somethings in C_file for it to work on local host again) (funni number :P ) <br> <br> also Tux Has Somethings To Say: <br>
    > <img src="assets/image.webp" alt="cool example image" width="500">
 
 ## Some Stuff
