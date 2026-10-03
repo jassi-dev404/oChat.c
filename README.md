@@ -2,7 +2,7 @@
 
 > NOTE: LLM Usage was there, it was used for fixing mainly HTTP errors, Majority Of The Code Was Written By ***HUMANS*** <br>
 
-# openChat.c <br> <img src="assets/openCc.jpg" alt="cool icon image" width="200">
+# openChat.c <br> <img src="assets/oChatc.webp" alt="cool icon image" width="200">
 
 > OpenChat.c, It Is An OpenSource Texting Platform Which Has A Terminal Style Ui Made Using [Jquery-Terminal](https://terminal.jcubic.pl/) And Has A ***CUSTOM MADE*** HTTP Server Powering It Using A Custom Json Based DataBase You Can Check It Out By <br> 
 > [(Clicking ME!)](https://ochatc.jassi.dev/)
