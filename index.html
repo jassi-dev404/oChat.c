@@ -114,7 +114,7 @@
                   let msgObj = chatArray[loaded_message_count];
                   term.echo("[[b;green;]" + msgObj.nickname + ": " + msgObj.msg + "]"); //prints out messages in db also makes it green
                   if (msgObj.msg.startsWith("tuxsay ")) {
-                    let tuxsays = response.slice(7);
+                    let tuxsays = msgObj.msg.slice(7);
                     let length = tuxsays.length;
                     let a = length + 2;
                     let b = "";
@@ -123,7 +123,7 @@
                       a = a - 1;
                     }
                     if (length)
-                      this.echo(" " + b + "\n" + "< " + what + " >" + "\n " + b + tux_say);
+                      this.echo(" " + b + "\n" + "< " + tuxsays + " >" + "\n " + b + tux_say);
                   }
                   if (msgObj.msg.includes(":sob:")) {
                     this.echo($('<img src="https://ochatc.jassi.dev/emojis_and_stuff/sob.png">'));
