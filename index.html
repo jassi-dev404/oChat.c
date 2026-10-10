@@ -11,7 +11,7 @@
     rel="stylesheet" />
   <meta property="og:type" content="website" />
   <link rel="icon" type="image/x-icon" href="/assets/oChatc.webp">
-  <!---  meta tags for some kewl embed features --->
+  <!--  meta tags for some kewl embed features -->
   <meta property="og:url" content="https://ochatc.jassi.dev/" />
   <meta property="og:title" content="Yes its me jassi, this is my super ultra mega cool chatting website" />
   <meta property="og:description"
@@ -134,11 +134,24 @@
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠑⠶⢦⠭⣽⡶⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
   </script>
 
+  <script id="heartbreak" type="text/plain">
+ ⢀⣴⣾⣿⣿⣿⣷⣦⡄⠀⣴⣾⣿⣿⣿⣿⣶⣄⠀⠀
+⣰⣿⣿⣿⣿⣿⣿⣿⠋⢠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣌⠛⣿⣿⣿⣿⣿⣿⣿⣿⡆
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢁⣼⣿⣿⣿⣿⣿⣿⣿⣿⠁
+⠸⣿⣿⣿⣿⣿⣿⣿⡟⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀
+⠀⠙⣿⣿⣿⣿⣿⣿⣄⠻⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀⠀
+⠀⠀⠈⠻⣿⣿⣿⣿⣿⣧⡈⢿⣿⣿⣿⣿⡟⠁⠀⠀⠀
+⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⡇⢸⣿⣿⠟⠉⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠈⠙⢿⡿⠀⡿⠛⠁⠀⠀⠀⠀⠀⠀⠀
+  </script>
+
   <script>
     const tux_say = $('#tux_say').text();
     const sob = $('#sob').text();
     const funni = $('#funni').text();
     const skull = $('#skull').text();
+    const heartbreak = $('heartbreak').text();
 
     const C_SERVER = "https://ochatcbackend.jassi.dev";
     const LOCAL_SERVER = "http://127.0.0.1:6969";
@@ -180,7 +193,7 @@
           this.echo("all commands are:" + "\n tuxsay (to make tux say what you want)" + "\n help (to get list of all possible commands)" + "\n connect (to connect to everyone on oChat.c, requires nickname as argument)" + "\n btw type 'emojis' to get all list of emojis and 'tuxsay' now works when connected to oChat.c");
         },
         emojis: function () {
-          this.echo(":sob:" + "\n :funni:")
+          this.echo(":sob:" + "\n :funni:" + "\n :heartbreak:" + "\n :skull:")
         },
         connect: function (nickname) {
           let term = this;  //saves a version of the terminal
@@ -210,6 +223,9 @@
                     if (length)
                       term.echo(" " + d + "\n" + "< " + tuxsays + " >" + "\n " + d + tux_say);
                   }
+                  if (msgObj.msg == "/emojis") { 
+                    this.echo(":sob:" + "\n :funni:" + "\n :heartbreak:" + "\n :skull:")
+                  }
                   if (msgObj.msg.includes(":sob:")) {
                     term.echo(sob);
                   }
@@ -218,6 +234,9 @@
                   }
                   if (msgObj.msg.includes(":skull:")) {
                     term.echo(skull);
+                  }
+                  if (msgObj.msg.includes(":heartbreak:")) {
+                    term.echo(heartbreak);
                   }
                   loaded_message_count++;   //increases loaded message count
                 }
