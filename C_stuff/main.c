@@ -116,8 +116,6 @@ int main(void) {
     setsockopt(abcd, SOL_SOCKET, SO_RCVTIMEO, &give_up_waiting,
                sizeof(give_up_waiting));
 
-    char *client_ip =
-        inet_ntoa(client_addr.sin_addr); // takes client's ip to store
 
     ssize_t are_we_online_rn; // initialises a ssize_t
 
@@ -227,7 +225,6 @@ int main(void) {
                 cJSON_AddStringToObject(entry, "msg", msg_field->valuestring);
                 cJSON_AddStringToObject(entry, "nickname",
                                         username->valuestring);
-                cJSON_AddStringToObject(entry, "IP", client_ip);
 
                 char *json_file_to_save = cJSON_PrintUnformatted(entry);
                 FILE *db = fopen(db_path,
