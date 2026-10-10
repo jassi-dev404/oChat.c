@@ -176,7 +176,7 @@
                   term.echo("[[b;green;]" + msgObj.nickname + ": " + msgObj.msg + "]"); //prints out messages in db also makes it green
                   if (msgObj.msg.startsWith("tuxsay ")) {
                     let tuxsays = msgObj.msg.slice(7);
-                    let length = String(tux_say).length;
+                    let length = String(tuxsays).length;
                     let c = length + 2;
                     let d = "";
                     while (c != 0) {
