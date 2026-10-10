@@ -177,20 +177,20 @@
                   if (msgObj.msg.startsWith("tuxsay ")) {
                     let tuxsays = msgObj.msg.slice(7);
                     let length = String(tux_say).length;
-                    let a = length + 2;
-                    let b = "";
+                    let c = length + 2;
+                    let d = "";
                     while (a != 0) {
-                      b = b + "-";
-                      a = a - 1;
+                      d = d + "-";
+                      c = c - 1;
                     }
                     if (length)
-                      term.echo(" " + b + "\n" + "< " + tuxsays + " >" + "\n " + b + tux_say);
+                      term.echo(" " + d + "\n" + "< " + tuxsays + " >" + "\n " + d + tux_say);
                   }
                   if (msgObj.msg.includes(":sob:")) {
-                    term.echo($(sob));
+                    term.echo(sob);
                   }
                   if (msgObj.msg.includes(":funni:")) {
-                    term.echo($(funni));
+                    term.echo(funni);
                   }
                   loaded_message_count++;   //increases loaded message count
                 }
