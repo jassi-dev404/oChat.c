@@ -20,12 +20,18 @@
   <script src="https://unpkg.com/js-polyfills/keyboard.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/jcubic/static/js/wcwidth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-
 </head>
 
 <body class="bg-black text-white h-screen">
-
+  <style>
+    .terminal {
+      --color: white;
+      --background: black;
+      --cursor-color: white;
+      --selection-color: black;
+      --selection-background: white;
+    }
+  </style>
   <script id="tux_say" type="text/plain">
    \
     \
@@ -189,8 +195,52 @@
           if (length)
             this.echo(" " + b + "\n" + "< " + what + " >" + "\n " + b + tux_say);
         },
+        theme: function (color) {
+          if (color == "help") {
+            this.echo("do theme <pallete>, pallete options are \n" + "1) catpuccin \n" + "2) dracula \n" + "3) nord \n" + "4) tokyo_night \n")
+          }
+          else if (color == "catpuccin") {
+            $('.terminal').css({
+              '--background': '#1e1e2e',
+              '--color': '#cdd6f4',
+              '--cursor-color': '#f5e0dc',
+              '--selection-background': '#45475a',
+              '--selection-color': '#cdd6f4'
+            });
+          }
+          else if (color == "dracula") {
+            $('.terminal').css({
+              '--background': '#282a36',
+              '--color': '#f8f8f2',
+              '--cursor-color': '#50fa7b',
+              '--selection-background': '#44475a',
+              '--selection-color': '#f8f8f2'
+            });
+          }
+          else if (color == "nord") {
+            $('.terminal').css({
+              '--background': '#2e3440',
+              '--color': '#d8dee9',
+              '--cursor-color': '#88c0d0',
+              '--selection-background': '#434c5e',
+              '--selection-color': '#eceff4'
+            });
+          }
+          else if (color == "tokyo_night") {
+            $('.terminal').css({
+              '--background': '#1a1b26',
+              '--color': '#a9b1d6',
+              '--cursor-color': '#7aa2f7',
+              '--selection-background': '#33467c',
+              '--selection-color': '#c0caf5'
+            });
+          }
+          else {
+            this.echo("invalid pallete option, type 'theme help' for pallete options")
+          }
+        },
         help: function () {
-          this.echo("all commands are:" + "\n tuxsay (to make tux say what you want)" + "\n help (to get list of all possible commands)" + "\n connect (to connect to everyone on oChat.c, requires nickname as argument)" + "\n btw type 'emojis' to get all list of emojis and 'tuxsay' now works when connected to oChat.c");
+          this.echo("all commands are:" + "\n tuxsay (to make tux say what you want)" + "\n theme <pallete> (do 'theme help' for getting all color options)" + "\n help (to get list of all possible commands)" + "\n connect (to connect to everyone on oChat.c, requires nickname as argument)" + "\n btw type 'emojis' to get all list of emojis and 'tuxsay' now works when connected to oChat.c");
         },
         emojis: function () {
           this.echo(":sob:" + "\n :funni:" + "\n :heartbreak:" + "\n :skull:")
@@ -223,20 +273,20 @@
                     if (length)
                       term.echo(" " + d + "\n" + "< " + tuxsays + " >" + "\n " + d + tux_say);
                   }
-                  if (msgObj.msg == "/emojis") { 
-                    this.echo(":sob:" + "\n :funni:" + "\n :heartbreak:" + "\n :skull:")
+                  if (msgObj.msg == "/emojis") {
+                    term.echo(":sob:" + "\n :funni:" + "\n :heartbreak:" + "\n :skull:")
                   }
                   if (msgObj.msg.includes(":sob:")) {
-                    term.echo(sob);
+                    term.echo("[[b;yellow;]" + sob + "]");
                   }
                   if (msgObj.msg.includes(":funni:")) {
-                    term.echo(funni);
+                    term.echo("[[b;blue;]" + funni + "]");
                   }
                   if (msgObj.msg.includes(":skull:")) {
                     term.echo(skull);
                   }
                   if (msgObj.msg.includes(":heartbreak:")) {
-                    term.echo(heartbreak);
+                    term.echo("[[b;red;]" + heartbreak + "]");
                   }
                   loaded_message_count++;   //increases loaded message count
                 }
