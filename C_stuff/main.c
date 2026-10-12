@@ -428,11 +428,16 @@ int main(void)
                           cJSON_GetObjectItemCaseSensitive(json, "word");
                       if (cJSON_IsString(item) && item->valuestring)
                       {
-                        // saves each swear word in the string
-                        if (strstr(msg_field->valuestring, item->valuestring) !=
-                                NULL ||
-                            strstr(username->valuestring, item->valuestring) !=
-                                NULL)
+                        char needle[1100], hay[BUFFER_SIZE + 2], //ok so in this it just puts spaces around the matches so that strstr only matches with whole words, i was lost so this was llm generated
+                            hay_user[BUFFER_SIZE + 2];
+                        snprintf(needle, sizeof needle, " %s ",
+                                 item->valuestring);
+                        snprintf(hay, sizeof hay, " %s ",
+                                 msg_field->valuestring);
+                        snprintf(hay_user, sizeof hay_user, " %s ",
+                                 username->valuestring);
+                        if (strstr(hay, needle) != NULL ||
+                            strstr(hay_user, needle) != NULL)
                         {
                           is_clean = 0;
                           cJSON_Delete(json);
