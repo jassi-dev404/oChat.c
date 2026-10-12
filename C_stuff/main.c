@@ -250,7 +250,7 @@ int main(void)
                       cJSON *item = cJSON_GetObjectItemCaseSensitive(json, "word"); // we need to check if anything is swear or not
                       if (cJSON_IsString(item) && item->valuestring)
                       {
-                        if (strstr(username->valuestring, item->valuestring) != NULL)
+                        if (strcasecmp(username->valuestring, item->valuestring) == 0)  //checks exact match now
                         {
                           is_clean = 0;
                           cJSON_Delete(json);
