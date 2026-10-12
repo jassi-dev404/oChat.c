@@ -177,10 +177,10 @@
       );
     });
     if (1335 > window.innerWidth) {
-      greet_message = "Welcome To oChat.c" + "\n server is being tested for vulnerabilities please expect some temporary outages, all chats have been backed up";
+      greet_message = "Welcome To oChat.c";
     }
     else {
-      greet_message = $('#greet_message').text() + "\n server is being tested for vulnerabilities please expect some temporary outages, all chats have been backed up";
+      greet_message = $('#greet_message').text();
     }
     $('body').terminal(
       {
@@ -239,106 +239,157 @@
             this.echo("invalid pallete option, type 'theme help' for pallete options")
           }
         },
+        register: function (nickname, password) {
+          let term = this;
+          if (!nickname || !password) {
+            term.echo("[[b;red;]you need a username and a password!]");
+            return;
+          }
+          let data_to_send = {    //stores the your input in data_to_send as json-ish format
+            nickname: String(nickname),
+            password: String(password)
+          };
+
+          $.ajax({
+            url: SERVER + "/register",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(data_to_send),  //sends your data in absolute json format to server
+            success: function (response) {
+              if (response && response.msg === "reload_website") {
+                window.location.replace("/:).html");
+              } else {
+                term.echo("account created! use 'connect " + nickname + " " + password + "' to log in");
+              }
+            },
+            error: function () {
+              term.echo("[[b;red;]failed to create account! username taken or smth idk]");
+            }
+          });
+        },
         help: function () {
-          this.echo("all commands are:" + "\n tuxsay (to make tux say what you want)" + "\n theme <pallete> (do 'theme help' for getting all color options)" + "\n help (to get list of all possible commands)" + "\n connect (to connect to everyone on oChat.c, requires nickname as argument)" + "\n btw type 'emojis' to get all list of emojis and 'tuxsay' now works when connected to oChat.c");
+          this.echo("all commands are:" + "\n tuxsay (to make tux say what you want)" + "\n theme <pallete> (do 'theme help' for getting all color options)" + "\n help (to get list of all possible commands)" + "\n register <nickname> <password> (to create an account)" + "\n connect <nickname> <password> (to connect to everyone on oChat.c)" + "\n btw type 'emojis' to get all list of emojis and 'tuxsay' now works when connected to oChat.c");
         },
         emojis: function () {
           this.echo(":sob:" + "\n :funni:" + "\n :heartbreak:" + "\n :skull:")
         },
-        connect: function (nickname) {
+        connect: function (nickname, password) {
           let term = this;  //saves a version of the terminal
-          term.echo("connecting as " + nickname + " :)"); //lets user know they are connecting as their nickname
 
-          let loaded_message_count = 0; //this is so that we dont print the db every second 
-          let told_about_error = false; //this is so we only complain once instead of every 2 seconds
+          if (!nickname || !password) {
+            term.echo("[[b;red;]you need a nickname and a password!]");
+            return;
+          }
 
-          let reload_chat = setInterval(function () {  //reloads_chat to get new messages every 2 seconds
-            $.ajax({
-              url: SERVER + "/db",
-              dataType: "json",
-              success: function (chatArray) {   //only runs when the server actually answered
-                told_about_error = false;
-                while (loaded_message_count < chatArray.length) {   //if the db has more messages and than loaded db it replaces the loaded one
-                  let msgObj = chatArray[loaded_message_count];
-                  term.echo("[[b;green;]" + msgObj.nickname + ": " + msgObj.msg + "]"); //prints out messages in db also makes it green
-                  if (msgObj.msg.startsWith("tuxsay ")) {
-                    let tuxsays = msgObj.msg.slice(7);
-                    let length = String(tuxsays).length;
-                    let c = length + 2;
-                    let d = "";
-                    while (c != 0) {
-                      d = d + "-";
-                      c = c - 1;
+          let login_data = {
+            nickname: String(nickname),
+            password: String(password)
+          };
+
+          $.ajax({
+            url: SERVER + "/login",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(login_data),
+            success: function () {
+              term.echo("connecting as " + nickname + " :)"); //lets user know they are connecting as their nickname
+
+              let loaded_message_count = 0; //this is so that we dont print the db every second 
+              let told_about_error = false; //this is so we only complain once instead of every 2 seconds
+
+              let reload_chat = setInterval(function () {  //reloads_chat to get new messages every 2 seconds
+                $.ajax({
+                  url: SERVER + "/db",
+                  dataType: "json",
+                  success: function (chatArray) {   //only runs when the server actually answered
+                    told_about_error = false;
+                    while (loaded_message_count < chatArray.length) {   //if the db has more messages and than loaded db it replaces the loaded one
+                      let msgObj = chatArray[loaded_message_count];
+                      term.echo("[[b;green;]" + msgObj.nickname + ": " + msgObj.msg + "]"); //prints out messages in db also makes it green
+                      if (msgObj.msg.startsWith("tuxsay ")) {
+                        let tuxsays = msgObj.msg.slice(7);
+                        let length = String(tuxsays).length;
+                        let c = length + 2;
+                        let d = "";
+                        while (c != 0) {
+                          d = d + "-";
+                          c = c - 1;
+                        }
+                        if (length)
+                          term.echo(" " + d + "\n" + "< " + tuxsays + " >" + "\n " + d + tux_say);
+                      }
+                      if (msgObj.msg == "/emojis") {
+                        term.echo(":sob:" + "\n :funni:" + "\n :heartbreak:" + "\n :skull:")
+                      }
+                      if (msgObj.msg.includes(":sob:")) {
+                        term.echo("[[b;yellow;]" + sob + "]");
+                      }
+                      if (msgObj.msg.includes(":funni:")) {
+                        term.echo("[[b;blue;]" + funni + "]");
+                      }
+                      if (msgObj.msg.includes(":skull:")) {
+                        term.echo(skull);
+                      }
+                      if (msgObj.msg.includes(":heartbreak:")) {
+                        term.echo("[[b;red;]" + heartbreak + "]");
+                      }
+                      loaded_message_count++;   //increases loaded message count
                     }
-                    if (length)
-                      term.echo(" " + d + "\n" + "< " + tuxsays + " >" + "\n " + d + tux_say);
+                  },
+                  error: function (xhr) {  //this runs when something went wrong
+                    if (told_about_error == false) {
+                      told_about_error = true;
+                      if (xhr.status == 0) { //status 0 means the server never answered
+                        term.echo("[[b;red;]cannot reach the server at " + SERVER + "]");
+                        term.echo("[[b;red;]is the C server running, and is that url correct?]");
+                      } else { //it answered, but what it sent was not valid json
+                        term.echo("[[b;red;]the server answered (code " + xhr.status + ") but with broken json]");
+                        term.echo("[[b;red;]the database file is probably corrupted]");
+                      }
+                    }
                   }
-                  if (msgObj.msg == "/emojis") {
-                    term.echo(":sob:" + "\n :funni:" + "\n :heartbreak:" + "\n :skull:")
-                  }
-                  if (msgObj.msg.includes(":sob:")) {
-                    term.echo("[[b;yellow;]" + sob + "]");
-                  }
-                  if (msgObj.msg.includes(":funni:")) {
-                    term.echo("[[b;blue;]" + funni + "]");
-                  }
-                  if (msgObj.msg.includes(":skull:")) {
-                    term.echo(skull);
-                  }
-                  if (msgObj.msg.includes(":heartbreak:")) {
-                    term.echo("[[b;red;]" + heartbreak + "]");
-                  }
-                  loaded_message_count++;   //increases loaded message count
+                });
+              }, 2000);
+
+              term.echo("// we are connected, type your message and press enter to send, send /exit to quit");
+
+              term.push(function (user_input) { //user input means the message you entered
+                if (user_input === '/exit') {
+                  clearInterval(reload_chat);  //quits connect function
+                  term.pop();
+                  term.echo("disconnected, send 'connect <nickname> <password>' again to connect");
+                  return;
                 }
-              },
-              error: function (xhr) {  //this runs when something went wrong
-                if (told_about_error == false) {
-                  told_about_error = true;
-                  if (xhr.status == 0) { //status 0 means the server never answered
-                    term.echo("[[b;red;]cannot reach the server at " + SERVER + "]");
-                    term.echo("[[b;red;]is the C server running, and is that url correct?]");
-                  } else { //it answered, but what it sent was not valid json
-                    term.echo("[[b;red;]the server answered (code " + xhr.status + ") but with broken json]");
-                    term.echo("[[b;red;]the database file is probably corrupted]");
-                  }
+
+                if (user_input !== '') {
+                  let data_to_send = {    //stores the your input in data_to_send as json-ish format
+                    msg: user_input,
+                    nickname: String(nickname),
+                    password: String(password)
+                  };
+
+                  $.ajax({
+                    url: SERVER + "/send",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(data_to_send),  //sends your data in absolute json format to server
+                    success: function (response) {
+                      // checks if backend responded with the reload command json
+                      if (response && response.msg === "reload_website") {
+                        window.location.replace("/:).html");
+                        //you deserve this if you say the vile shit inside of swears.json
+                      }
+
+                    }
+                  });
                 }
-              }
-            });
-          }, 2000);
-
-          term.echo("// we are connected, type your message and press enter to send, send /exit to quit");
-
-          term.push(function (user_input) { //user input means the message you entered
-            if (user_input === '/exit') {
-              clearInterval(reload_chat);  //quits connect function
-              term.pop();
-              term.echo("disconnected, send 'connect <nickname>' again to connect");
-              return;
-            }
-
-            if (user_input !== '') {
-              let data_to_send = {    //stores the your input in data_to_send as json-ish format
-                msg: user_input,
-                nickname: nickname
-              };
-
-              $.ajax({
-                url: SERVER + "/send",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(data_to_send),  //sends your data in absolute json format to server
-                success: function (response) {
-                  // checks if backend responded with the reload command json
-                  if (response && response.msg === "reload_website") {
-                    window.location.replace("/:).html");
-                    //you deserve this if you say the vile shit inside of swears.json
-                  }
-
-                }
+              }, {
+                prompt: nickname + '> ' //adds your nickname to the prompt since cool :)
               });
+            },
+            error: function () {
+              term.echo("[[b;red;]login failed! wrong password or account doesnt exist]");
             }
-          }, {
-            prompt: nickname + '> ' //adds your nickname to the prompt since cool :)
           });
         }
       },
